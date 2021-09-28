@@ -1,14 +1,12 @@
 package main
 
 import (
-
 	"fmt"
 	"log"
+	"net/http"
 	"web-dev-go/pkg/config"
 	"web-dev-go/pkg/handlers"
 	"web-dev-go/pkg/render"
-
-	"net/http"
 )
 
  const portNumber = ":8080"
@@ -25,19 +23,24 @@ func main() {
 
 	app.TemplateCache = tc
 	app.UseCache = false
+
 	repo := handlers.NewRepo(&app)
 	handlers.NewHandlers(repo)
-
 	render.NewTemplates(&app)
 
-http.HandleFunc("/", handlers.Repo.Home)
-http.HandleFunc("/about", handlers.Repo.About)
+
 
 fmt.Println(fmt.Sprintf("Starting application on part %s", portNumber))
-_ = http.ListenAndServe(portNumber, nil)
+
+srv := &http.Server {
+	Addr: portNumber,
+	Handler: routes(&app),
 }
 
 
+ err = srv.ListenAndServe()
+ log.Fatal(err)
+}
 
 
 
